@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Disciplinas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Gerenciamento de Disciplinas</h1>
+        
+        <!-- Formulário de Cadastro/Atualização -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Cadastrar/Atualizar Disciplina</h5>
+            </div>
+            <div class="card-body">
+                <form id="disciplinaForm">
+                    <input type="hidden" id="disciplinaId">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="codigo" class="form-label">Código</label>
+                        <input type="text" class="form-control" id="codigo" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="cargaHoraria" class="form-label">Carga Horária</label>
+                        <input type="number" class="form-control" id="cargaHoraria" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-secondary" onclick="limparFormulario()">Limpar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de Disciplinas -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lista de Disciplinas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Código</th>
+                                <th>Carga Horária</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="disciplinasLista"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funções auxiliares
+        const API_URL = 'http://localhost:3001/disciplinas';
+
+        async function carregarDisciplinas() {
+            try {
+                const response = await fetch(API_URL);
+                const disciplinas = await response.json();
+                const tbody = document.getElementById('disciplinasLista');
+                tbody.innerHTML = '';
+                
+                disciplinas.forEach(disciplina => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${disciplina.id}</td>
+                            <td>${disciplina.nome}</td>
+                            <td>${disciplina.codigo}</td>
+                            <td>${disciplina.cargaHoraria}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editarDisciplina(${disciplina.id})">Editar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                alert('Erro ao carregar disciplinas: ' + error.message);
+            }
+        }
+
+        async function salvarDisciplina(event) {
+            event.preventDefault();
+            const disciplinaId = document.getElementById('disciplinaId').value;
+            const disciplina = {
+                nome: document.getElementById('nome').value,
+                codigo: document.getElementById('codigo').value,
+                cargaHoraria: parseInt(document.getElementById('cargaHoraria').value)
+            };
+
+            try {
+                const url = disciplinaId ? `${API_URL}/${disciplinaId}` : API_URL;
+                const method = disciplinaId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(disciplina)
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar disciplina');
+                
+                limparFormulario();
+                carregarDisciplinas();
+                alert('Disciplina salva com sucesso!');
+            } catch (error) {
+                alert('Erro ao salvar disciplina: ' + error.message);
+            }
+        }
+
+        async function editarDisciplina(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                const disciplina = await response.json();
+                
+                document.getElementById('disciplinaId').value = disciplina.id;
+                document.getElementById('nome').value = disciplina.nome;
+                document.getElementById('codigo').value = disciplina.codigo;
+                document.getElementById('cargaHoraria').value = disciplina.cargaHoraria;
+            } catch (error) {
+                alert('Erro ao carregar disciplina: ' + error.message);
+            }
+        }
+
+        function limparFormulario() {
+            document.getElementById('disciplinaId').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('codigo').value = '';
+            document.getElementById('cargaHoraria').value = '';
+        }
+
+        // Event Listeners
+        document.getElementById('disciplinaForm').addEventListener('submit', salvarDisciplina);
+        document.addEventListener('DOMContentLoaded', carregarDisciplinas);
+    </script>
+</body>
+</html> 

@@ -1,0 +1,236 @@
+.App {
+  text-align: center;
+}
+
+.menu-card {
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.menu-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(13, 110, 253, 0.3);
+  border: 2px solid #4a9eff;
+}
+
+.menu-card:hover::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, 
+    rgba(74, 158, 255, 0.1) 0%, 
+    rgba(13, 110, 253, 0.1) 50%, 
+    rgba(74, 158, 255, 0.1) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.menu-card .card-body {
+  position: relative;
+  z-index: 2;
+}
+
+.card {
+  border: none;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.card:hover {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+  border-radius: 12px 12px 0 0;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border: none;
+  padding: 10px 24px;
+  color: #ffffff !important;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(13, 110, 253, 0.4);
+}
+
+.btn-primary:focus,
+.btn-primary:active {
+  color: #ffffff !important;
+}
+
+.table th {
+  background-color: #f8f9fa;
+}
+
+/* Tema Claro (padrão) */
+.light-theme {
+  --bg-color: #ffffff;
+  --text-color: #212529;
+  --card-bg: #ffffff;
+  --border-color: #dee2e6;
+  --navbar-bg: #0d6efd;
+  --navbar-text: #ffffff;
+  --table-bg: #ffffff;
+  --table-hover: #f8f9fa;
+  --table-header-bg: #f8f9fa;
+  color: #212529 !important;
+}
+
+/* Tema Escuro */
+.dark-theme {
+  --bg-color: #121212;
+  --text-color: #e0e0e0;
+  --card-bg: #1e1e1e;
+  --border-color: #424242;
+  --navbar-bg: #1976d2;
+  --navbar-text: #ffffff;
+  --table-bg: #1e1e1e;
+  --table-hover: #2d2d2d;
+  --table-header-bg: #2d2d2d;
+  color: #e0e0e0 !important;
+}
+
+/* Efeitos especiais para o tema escuro */
+.dark-theme .menu-card:hover {
+  box-shadow: 0 8px 25px rgba(74, 158, 255, 0.4);
+  border: 2px solid #66b3ff;
+}
+
+.dark-theme .menu-card:hover::before {
+  background: linear-gradient(45deg, 
+    rgba(74, 158, 255, 0.15) 0%, 
+    rgba(102, 179, 255, 0.15) 50%, 
+    rgba(74, 158, 255, 0.15) 100%);
+}
+
+.dark-theme .card:hover {
+  box-shadow: 0 4px 15px rgba(74, 158, 255, 0.2);
+}
+
+/* Aplicar o tema ao body */
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+.card-header {
+  background-color: var(--card-bg) !important;
+  border-bottom-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+.card-body {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Tabelas */
+.table {
+  --bs-table-bg: var(--table-bg) !important;
+  --bs-table-color: var(--text-color) !important;
+  --bs-table-hover-bg: var(--table-hover) !important;
+  --bs-table-striped-bg: var(--table-hover) !important;
+  color: var(--text-color) !important;
+}
+
+.table th,
+.table td {
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+  background-color: transparent !important;
+}
+
+.table th {
+  background-color: var(--table-header-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Navbar */
+.navbar-dark {
+  background-color: var(--navbar-bg) !important;
+}
+
+.navbar-dark .navbar-brand,
+.navbar-dark .nav-link {
+  color: #ffffff !important;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #ffffff !important;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+  color: #f8f9fa !important;
+}
+
+/* Toggle do tema */
+.theme-toggle:hover {
+  transform: scale(1.1);
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Garantir que títulos e textos herdem a cor do tema */
+h1, h2, h3, h4, h5, h6, p, span {
+  color: var(--text-color) !important;
+}
+
+/* Menu cards */
+.menu-card .card-title,
+.menu-card .card-text {
+  color: var(--text-color) !important;
+}
+
+/* Efeito de hover para botões da tabela */
+.btn-warning:hover, .btn-danger:hover, .btn-success:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Transições suaves */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+} 

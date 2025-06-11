@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Turmas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Gerenciamento de Turmas</h1>
+        
+        <!-- Formulário de Cadastro/Atualização -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Cadastrar/Atualizar Turma</h5>
+            </div>
+            <div class="card-body">
+                <form id="turmaForm">
+                    <input type="hidden" id="turmaId">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="disciplina" class="form-label">Disciplina</label>
+                        <select class="form-control" id="disciplina" required>
+                            <option value="">Selecione uma disciplina</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="professor" class="form-label">Professor</label>
+                        <select class="form-control" id="professor" required>
+                            <option value="">Selecione um professor</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="local" class="form-label">Local</label>
+                        <select class="form-control" id="local" required>
+                            <option value="">Selecione um local</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-secondary" onclick="limparFormulario()">Limpar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de Turmas -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lista de Turmas</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Disciplina</th>
+                                <th>Professor</th>
+                                <th>Local</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="turmasLista"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funções auxiliares
+        const API_URL = 'http://localhost:3001/turmas';
+        const DISCIPLINAS_URL = 'http://localhost:3001/disciplinas';
+        const PROFESSORES_URL = 'http://localhost:3001/professores';
+        const LOCAIS_URL = 'http://localhost:3001/locais';
+
+        // Carregar dados para os selects
+        async function carregarSelects() {
+            try {
+                // Carregar disciplinas
+                const disciplinasResponse = await fetch(DISCIPLINAS_URL);
+                const disciplinas = await disciplinasResponse.json();
+                const disciplinaSelect = document.getElementById('disciplina');
+                disciplinas.forEach(disciplina => {
+                    disciplinaSelect.innerHTML += `<option value="${disciplina.id}">${disciplina.nome}</option>`;
+                });
+
+                // Carregar professores
+                const professoresResponse = await fetch(PROFESSORES_URL);
+                const professores = await professoresResponse.json();
+                const professorSelect = document.getElementById('professor');
+                professores.forEach(professor => {
+                    professorSelect.innerHTML += `<option value="${professor.id}">${professor.nome}</option>`;
+                });
+
+                // Carregar locais
+                const locaisResponse = await fetch(LOCAIS_URL);
+                const locais = await locaisResponse.json();
+                const localSelect = document.getElementById('local');
+                locais.forEach(local => {
+                    localSelect.innerHTML += `<option value="${local.id}">${local.nome}</option>`;
+                });
+            } catch (error) {
+                alert('Erro ao carregar dados: ' + error.message);
+            }
+        }
+
+        async function carregarTurmas() {
+            try {
+                const response = await fetch(API_URL);
+                const turmas = await response.json();
+                const tbody = document.getElementById('turmasLista');
+                tbody.innerHTML = '';
+                
+                for (const turma of turmas) {
+                    // Buscar dados relacionados
+                    const [disciplina, professor, local] = await Promise.all([
+                        fetch(`${DISCIPLINAS_URL}/${turma.disciplinaId}`).then(r => r.json()),
+                        fetch(`${PROFESSORES_URL}/${turma.professorId}`).then(r => r.json()),
+                        fetch(`${LOCAIS_URL}/${turma.localId}`).then(r => r.json())
+                    ]);
+
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${turma.id}</td>
+                            <td>${turma.nome}</td>
+                            <td>${disciplina.nome}</td>
+                            <td>${professor.nome}</td>
+                            <td>${local.nome}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editarTurma(${turma.id})">Editar</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+            } catch (error) {
+                alert('Erro ao carregar turmas: ' + error.message);
+            }
+        }
+
+        async function salvarTurma(event) {
+            event.preventDefault();
+            const turmaId = document.getElementById('turmaId').value;
+            const turma = {
+                nome: document.getElementById('nome').value,
+                disciplinaId: document.getElementById('disciplina').value,
+                professorId: document.getElementById('professor').value,
+                localId: document.getElementById('local').value
+            };
+
+            try {
+                const url = turmaId ? `${API_URL}/${turmaId}` : API_URL;
+                const method = turmaId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(turma)
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar turma');
+                
+                limparFormulario();
+                carregarTurmas();
+                alert('Turma salva com sucesso!');
+            } catch (error) {
+                alert('Erro ao salvar turma: ' + error.message);
+            }
+        }
+
+        async function editarTurma(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                const turma = await response.json();
+                
+                document.getElementById('turmaId').value = turma.id;
+                document.getElementById('nome').value = turma.nome;
+                document.getElementById('disciplina').value = turma.disciplinaId;
+                document.getElementById('professor').value = turma.professorId;
+                document.getElementById('local').value = turma.localId;
+            } catch (error) {
+                alert('Erro ao carregar turma: ' + error.message);
+            }
+        }
+
+        function limparFormulario() {
+            document.getElementById('turmaId').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('disciplina').value = '';
+            document.getElementById('professor').value = '';
+            document.getElementById('local').value = '';
+        }
+
+        // Event Listeners
+        document.getElementById('turmaForm').addEventListener('submit', salvarTurma);
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarSelects();
+            carregarTurmas();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Locais</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-4">
+        <h1>Gerenciamento de Locais</h1>
+        
+        <!-- Formulário de Cadastro/Atualização -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Cadastrar/Atualizar Local</h5>
+            </div>
+            <div class="card-body">
+                <form id="localForm">
+                    <input type="hidden" id="localId">
+                    <div class="mb-3">
+                        <label for="nome" class="form-label">Nome</label>
+                        <input type="text" class="form-control" id="nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="capacidade" class="form-label">Capacidade</label>
+                        <input type="number" class="form-control" id="capacidade" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <button type="button" class="btn btn-secondary" onclick="limparFormulario()">Limpar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Lista de Locais -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Lista de Locais</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome</th>
+                                <th>Capacidade</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="locaisLista"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Funções auxiliares
+        const API_URL = 'http://localhost:3001/locais';
+
+        async function carregarLocais() {
+            try {
+                const response = await fetch(API_URL);
+                const locais = await response.json();
+                const tbody = document.getElementById('locaisLista');
+                tbody.innerHTML = '';
+                
+                locais.forEach(local => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${local.id}</td>
+                            <td>${local.nome}</td>
+                            <td>${local.capacidade}</td>
+                            <td>
+                                <button class="btn btn-sm btn-warning" onclick="editarLocal(${local.id})">Editar</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            } catch (error) {
+                alert('Erro ao carregar locais: ' + error.message);
+            }
+        }
+
+        async function salvarLocal(event) {
+            event.preventDefault();
+            const localId = document.getElementById('localId').value;
+            const local = {
+                nome: document.getElementById('nome').value,
+                capacidade: parseInt(document.getElementById('capacidade').value)
+            };
+
+            try {
+                const url = localId ? `${API_URL}/${localId}` : API_URL;
+                const method = localId ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(local)
+                });
+
+                if (!response.ok) throw new Error('Erro ao salvar local');
+                
+                limparFormulario();
+                carregarLocais();
+                alert('Local salvo com sucesso!');
+            } catch (error) {
+                alert('Erro ao salvar local: ' + error.message);
+            }
+        }
+
+        async function editarLocal(id) {
+            try {
+                const response = await fetch(`${API_URL}/${id}`);
+                const local = await response.json();
+                
+                document.getElementById('localId').value = local.id;
+                document.getElementById('nome').value = local.nome;
+                document.getElementById('capacidade').value = local.capacidade;
+            } catch (error) {
+                alert('Erro ao carregar local: ' + error.message);
+            }
+        }
+
+        function limparFormulario() {
+            document.getElementById('localId').value = '';
+            document.getElementById('nome').value = '';
+            document.getElementById('capacidade').value = '';
+        }
+
+        // Event Listeners
+        document.getElementById('localForm').addEventListener('submit', salvarLocal);
+        document.addEventListener('DOMContentLoaded', carregarLocais);
+    </script>
+</body>
+</html> 

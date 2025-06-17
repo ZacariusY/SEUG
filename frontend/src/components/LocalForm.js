@@ -17,7 +17,7 @@ function LocalForm() {
   
   const [errors, setErrors] = useState({});
 
-  const API_URL = 'http://localhost:3001/locais';
+  const API_URL = 'http://localhost:3001/api/locais';
 
   const carregarLocal = useCallback(async () => {
     try {
@@ -68,8 +68,8 @@ function LocalForm() {
       novosErros.local = 'Local é obrigatório';
     }
     
-    if (!formData.capacidade || parseInt(formData.capacidade) <= 0) {
-      novosErros.capacidade = 'Capacidade deve ser um número maior que zero';
+    if (!formData.capacidade || formData.capacidade === "" || parseInt(formData.capacidade) <= 0) {
+      novosErros.capacidade = 'Capacidade deve ser maior que zero';
     }
     
     setErrors(novosErros);
@@ -86,7 +86,7 @@ function LocalForm() {
     try {
       const dataToSend = {
         ...formData,
-        capacidade: parseInt(formData.capacidade)
+        capacidade: formData.capacidade && formData.capacidade !== "" ? parseInt(formData.capacidade) : 0
       };
       
       if (isEdit) {

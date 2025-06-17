@@ -6,7 +6,7 @@ function Locais() {
   const [filtro, setFiltro] = useState('');
   const [ordenacao, setOrdenacao] = useState({ campo: 'nome', direcao: 'asc' });
 
-  const API_URL = 'http://localhost:3001/locais';
+  const API_URL = 'http://localhost:3001/api/locais';
 
   useEffect(() => {
     carregarLocais();

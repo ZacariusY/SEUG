@@ -39,8 +39,8 @@ COPY public/ ./public/
 # Copiar build do frontend do stage anterior
 COPY --from=frontend-build /app/frontend/build ./frontend/build
 
-# Criar diretório para o banco de dados SQLite
-RUN mkdir -p /app/data && chown -R seug:nodejs /app
+# Alterar propriedade dos arquivos para o usuário seug
+RUN chown -R seug:nodejs /app
 
 # Mudar para usuário não-root
 USER seug

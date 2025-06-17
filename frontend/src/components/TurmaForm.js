@@ -21,9 +21,9 @@ function TurmaForm() {
   const [locais, setLocais] = useState([]);
   const [errors, setErrors] = useState({});
 
-  const API_URL_TURMAS = 'http://localhost:3001/turmas';
-  const API_URL_DISCIPLINAS = 'http://localhost:3001/disciplinas';
-  const API_URL_LOCAIS = 'http://localhost:3001/locais';
+  const API_URL_TURMAS = 'http://localhost:3001/api/turmas';
+  const API_URL_DISCIPLINAS = 'http://localhost:3001/api/disciplinas';
+  const API_URL_LOCAIS = 'http://localhost:3001/api/locais';
 
   const carregarDisciplinas = useCallback(async () => {
     try {
@@ -128,8 +128,8 @@ function TurmaForm() {
     try {
       const dataToSend = {
         ...formData,
-        disciplinaId: formData.disciplinaId ? parseInt(formData.disciplinaId) : null,
-        localId: formData.localId ? parseInt(formData.localId) : null
+        disciplinaId: formData.disciplinaId && formData.disciplinaId !== "" ? parseInt(formData.disciplinaId) : null,
+        localId: formData.localId && formData.localId !== "" ? parseInt(formData.localId) : null
       };
       
       if (isEdit) {

@@ -16,7 +16,7 @@ function AlunoForm() {
   
   const [errors, setErrors] = useState({});
 
-  const API_URL = 'http://localhost:3001/alunos';
+  const API_URL = 'http://localhost:3001/api/alunos';
 
   const carregarAluno = useCallback(async () => {
     try {

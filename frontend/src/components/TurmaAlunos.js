@@ -13,8 +13,8 @@ function TurmaAlunos() {
   const [mostrarModal, setMostrarModal] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
-  const API_URL_TURMAS = 'http://localhost:3001/turmas';
-  const API_URL_ALUNOS = 'http://localhost:3001/alunos';
+  const API_URL_TURMAS = 'http://localhost:3001/api/turmas';
+  const API_URL_ALUNOS = 'http://localhost:3001/api/alunos';
 
   useEffect(() => {
     carregarDadosTurma();

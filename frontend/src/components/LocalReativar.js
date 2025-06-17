@@ -7,7 +7,7 @@ function LocalReativar() {
   const [filtro, setFiltro] = useState('');
   const navigate = useNavigate();
 
-  const API_URL = 'http://localhost:3001/locais';
+  const API_URL = 'http://localhost:3001/api/locais';
 
   useEffect(() => {
     carregarLocais();

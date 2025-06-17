@@ -18,7 +18,7 @@ function ProfessorForm() {
   
   const [errors, setErrors] = useState({});
 
-  const API_URL = 'http://localhost:3001/professores';
+  const API_URL = 'http://localhost:3001/api/professores';
 
   const carregarProfessor = useCallback(async () => {
     try {

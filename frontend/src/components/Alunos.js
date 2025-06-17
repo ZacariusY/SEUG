@@ -6,7 +6,7 @@ function Alunos() {
   const [filtro, setFiltro] = useState('');
   const [ordenacao, setOrdenacao] = useState({ campo: 'nome', direcao: 'asc' });
 
-  const API_URL = 'http://localhost:3001/alunos';
+  const API_URL = 'http://localhost:3001/api/alunos';
 
   useEffect(() => {
     carregarAlunos();

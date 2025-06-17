@@ -3,16 +3,35 @@ const router = express.Router();
 const { AppDataSource } = require("../database/data-source");
 const Disciplina = require("../entities/Disciplina");
 
-const disciplinaRepo = AppDataSource.getRepository("Disciplina");
+const disciplinaRepo = AppDataSource.getRepository(Disciplina);
+
+// Rota específica para /novo (DEVE VIR ANTES DE /:id)
+router.get("/novo", (req, res) => {
+  // Esta rota deve ser tratada pelo React Router do frontend
+  // Retornar o HTML do React
+  if (process.env.NODE_ENV === 'production') {
+    const path = require('path');
+    res.sendFile(path.join(__dirname, "../../frontend/build/index.html"));
+  } else {
+    res.status(404).json({ message: "Esta rota deve ser acessada pelo frontend em desenvolvimento" });
+  }
+});
 
 // Criar uma nova disciplina
 router.post("/", async (req, res) => {
   try {
-    const disciplina = disciplinaRepo.create(req.body);
-    await disciplinaRepo.save(disciplina);
-    res.status(201).json(disciplina);
+    // Remover campos que não devem ser enviados (como id)
+    const { id, ...dadosLimpos } = req.body;
+    
+    const disciplina = disciplinaRepo.create(dadosLimpos);
+    const result = await disciplinaRepo.save(disciplina);
+    res.status(201).json(result);
   } catch (error) {
-    res.status(400).json({ message: "Erro ao criar disciplina", error: error.message });
+    console.error("Erro ao criar disciplina:", error);
+    res.status(400).json({ 
+      message: error.message, 
+      details: error.detail || error.query || 'Erro interno'
+    });
   }
 });
 
@@ -29,7 +48,12 @@ router.get("/", async (_, res) => {
 // Buscar uma disciplina específica
 router.get("/:id", async (req, res) => {
   try {
-    const disciplina = await disciplinaRepo.findOneBy({ id: req.params.id });
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
+    const disciplina = await disciplinaRepo.findOneBy({ id: id });
     if (!disciplina) {
       return res.status(404).json({ message: "Disciplina não encontrada" });
     }
@@ -42,7 +66,12 @@ router.get("/:id", async (req, res) => {
 // Atualizar uma disciplina
 router.put("/:id", async (req, res) => {
   try {
-    const disciplina = await disciplinaRepo.findOneBy({ id: req.params.id });
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
+    const disciplina = await disciplinaRepo.findOneBy({ id: id });
     if (!disciplina) {
       return res.status(404).json({ message: "Disciplina não encontrada" });
     }
@@ -57,7 +86,12 @@ router.put("/:id", async (req, res) => {
 // Alterar status da disciplina
 router.patch("/:id/status", async (req, res) => {
   try {
-    const disciplina = await disciplinaRepo.findOneBy({ id: req.params.id });
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
+    const disciplina = await disciplinaRepo.findOneBy({ id: id });
     if (!disciplina) {
       return res.status(404).json({ message: "Disciplina não encontrada" });
     }

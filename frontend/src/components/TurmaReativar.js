@@ -9,9 +9,9 @@ function TurmaReativar() {
   const [filtro, setFiltro] = useState('');
   const navigate = useNavigate();
 
-  const API_URL_TURMAS = 'http://localhost:3001/turmas';
-  const API_URL_DISCIPLINAS = 'http://localhost:3001/disciplinas';
-  const API_URL_LOCAIS = 'http://localhost:3001/locais';
+  const API_URL_TURMAS = 'http://localhost:3001/api/turmas';
+  const API_URL_DISCIPLINAS = 'http://localhost:3001/api/disciplinas';
+  const API_URL_LOCAIS = 'http://localhost:3001/api/locais';
 
   useEffect(() => {
     carregarTurmas();

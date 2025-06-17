@@ -29,7 +29,7 @@ function Pesquisa() {
     setCarregando(true);
     try {
       const categoriaInfo = categorias.find(c => c.value === categoria);
-      const response = await axios.get(`http://localhost:3001/${categoriaInfo.endpoint}`);
+      const response = await axios.get(`http://localhost:3001/api/${categoriaInfo.endpoint}`);
       
       const resultadosFiltrados = response.data
         .filter(item => {
@@ -45,7 +45,7 @@ function Pesquisa() {
         const alunosData = {};
         for (const turma of resultadosFiltrados) {
           try {
-            const alunosResponse = await axios.get(`http://localhost:3001/turmas/${turma.id}/alunos`);
+            const alunosResponse = await axios.get(`http://localhost:3001/api/turmas/${turma.id}/alunos`);
             alunosData[turma.id] = alunosResponse.data;
           } catch (error) {
             console.error(`Erro ao carregar alunos da turma ${turma.id}:`, error);

@@ -18,8 +18,8 @@ function DisciplinaForm() {
   const [professores, setProfessores] = useState([]);
   const [errors, setErrors] = useState({});
 
-  const API_URL_DISCIPLINAS = 'http://localhost:3001/disciplinas';
-  const API_URL_PROFESSORES = 'http://localhost:3001/professores';
+  const API_URL_DISCIPLINAS = 'http://localhost:3001/api/disciplinas';
+  const API_URL_PROFESSORES = 'http://localhost:3001/api/professores';
 
   const carregarProfessores = useCallback(async () => {
     try {
@@ -105,7 +105,7 @@ function DisciplinaForm() {
     try {
       const dataToSend = {
         ...formData,
-        professorId: formData.professorId ? parseInt(formData.professorId) : null
+        professorId: formData.professorId && formData.professorId !== "" ? parseInt(formData.professorId) : null
       };
       
       if (isEdit) {

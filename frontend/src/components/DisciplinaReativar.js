@@ -8,8 +8,8 @@ function DisciplinaReativar() {
   const [filtro, setFiltro] = useState('');
   const navigate = useNavigate();
 
-  const API_URL_DISCIPLINAS = 'http://localhost:3001/disciplinas';
-  const API_URL_PROFESSORES = 'http://localhost:3001/professores';
+  const API_URL_DISCIPLINAS = 'http://localhost:3001/api/disciplinas';
+  const API_URL_PROFESSORES = 'http://localhost:3001/api/professores';
 
   useEffect(() => {
     carregarDisciplinas();

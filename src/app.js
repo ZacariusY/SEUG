@@ -12,6 +12,16 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// MIDDLEWARE DE LOG PARA DEBUG - CAPTURA TODAS AS REQUISIÇÕES
+app.use((req, res, next) => {
+  console.log(`🔍 ${new Date().toISOString()} - ${req.method} ${req.originalUrl}`);
+  console.log(`📍 Headers: ${JSON.stringify(req.headers, null, 2)}`);
+  if (req.body && Object.keys(req.body).length > 0) {
+    console.log(`📦 Body: ${JSON.stringify(req.body, null, 2)}`);
+  }
+  next();
+});
+
 // Servir arquivos estáticos do frontend React (produção)
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, "../frontend/build")));
@@ -24,12 +34,12 @@ AppDataSource.initialize()
   .then(() => {
     console.log("📦 Banco conectado");
 
-    // Rotas da API
-    app.use("/alunos", alunoRoutes);
-    app.use("/professores", professorRoutes);
-    app.use("/disciplinas", disciplinaRoutes);
-    app.use("/turmas", turmaRoutes);
-    app.use("/locais", localRoutes);
+    // Rotas da API (DEVEM VIR ANTES DA ROTA CATCH-ALL)
+    app.use("/api/alunos", alunoRoutes);
+    app.use("/api/professores", professorRoutes);
+    app.use("/api/disciplinas", disciplinaRoutes);
+    app.use("/api/turmas", turmaRoutes);
+    app.use("/api/locais", localRoutes);
 
     // Em produção, servir o React app para todas as rotas não-API
     if (process.env.NODE_ENV === 'production') {

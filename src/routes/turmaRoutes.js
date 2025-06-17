@@ -9,6 +9,18 @@ const turmaRepository = AppDataSource.getRepository(Turma);
 const turmaAlunoRepository = AppDataSource.getRepository(TurmaAluno);
 const alunoRepository = AppDataSource.getRepository(Aluno);
 
+// Rota específica para /novo (DEVE VIR ANTES DE /:id)
+router.get("/novo", (req, res) => {
+  // Esta rota deve ser tratada pelo React Router do frontend
+  // Retornar o HTML do React
+  if (process.env.NODE_ENV === 'production') {
+    const path = require('path');
+    res.sendFile(path.join(__dirname, "../../frontend/build/index.html"));
+  } else {
+    res.status(404).json({ message: "Esta rota deve ser acessada pelo frontend em desenvolvimento" });
+  }
+});
+
 // Listar todas as turmas
 router.get("/", async (req, res) => {
   try {
@@ -24,8 +36,13 @@ router.get("/", async (req, res) => {
 // Buscar turma por ID
 router.get("/:id", async (req, res) => {
   try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
     const turma = await turmaRepository.findOne({
-      where: { id: parseInt(req.params.id) },
+      where: { id: id },
       relations: ["disciplina", "local"],
     });
     if (!turma) {
@@ -40,19 +57,31 @@ router.get("/:id", async (req, res) => {
 // Criar nova turma
 router.post("/", async (req, res) => {
   try {
-    const turma = turmaRepository.create(req.body);
+    // Remover campos que não devem ser enviados (como id)
+    const { id, ...dadosLimpos } = req.body;
+    
+    const turma = turmaRepository.create(dadosLimpos);
     const result = await turmaRepository.save(turma);
     res.status(201).json(result);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error("Erro ao criar turma:", error);
+    res.status(400).json({ 
+      message: error.message, 
+      details: error.detail || error.query || 'Erro interno'
+    });
   }
 });
 
 // Atualizar turma
 router.put("/:id", async (req, res) => {
   try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
     const turma = await turmaRepository.findOne({
-      where: { id: parseInt(req.params.id) },
+      where: { id: id },
     });
     if (!turma) {
       return res.status(404).json({ message: "Turma não encontrada" });
@@ -68,8 +97,13 @@ router.put("/:id", async (req, res) => {
 // Excluir turma
 router.delete("/:id", async (req, res) => {
   try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
     const turma = await turmaRepository.findOne({
-      where: { id: parseInt(req.params.id) },
+      where: { id: id },
     });
     if (!turma) {
       return res.status(404).json({ message: "Turma não encontrada" });
@@ -84,8 +118,13 @@ router.delete("/:id", async (req, res) => {
 // Alterar status da turma
 router.patch("/:id/status", async (req, res) => {
   try {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
     const turma = await turmaRepository.findOne({
-      where: { id: parseInt(req.params.id) },
+      where: { id: id },
     });
     if (!turma) {
       return res.status(404).json({ message: "Turma não encontrada" });
@@ -102,6 +141,10 @@ router.patch("/:id/status", async (req, res) => {
 router.get("/:id/alunos", async (req, res) => {
   try {
     const turmaId = parseInt(req.params.id);
+    if (isNaN(turmaId)) {
+      return res.status(400).json({ message: "ID inválido" });
+    }
+    
     const turmaAlunos = await turmaAlunoRepository.find({
       where: { turmaId },
       relations: ["aluno"]
@@ -118,7 +161,15 @@ router.get("/:id/alunos", async (req, res) => {
 router.post("/:id/alunos", async (req, res) => {
   try {
     const turmaId = parseInt(req.params.id);
+    if (isNaN(turmaId)) {
+      return res.status(400).json({ message: "ID da turma inválido" });
+    }
+    
     const { alunoId } = req.body;
+    const alunoIdParsed = parseInt(alunoId);
+    if (isNaN(alunoIdParsed)) {
+      return res.status(400).json({ message: "ID do aluno inválido" });
+    }
     
     // Verificar se a turma existe
     const turma = await turmaRepository.findOne({
@@ -130,7 +181,7 @@ router.post("/:id/alunos", async (req, res) => {
     
     // Verificar se o aluno existe
     const aluno = await alunoRepository.findOne({
-      where: { id: alunoId }
+      where: { id: alunoIdParsed }
     });
     if (!aluno) {
       return res.status(404).json({ message: "Aluno não encontrado" });
@@ -138,7 +189,7 @@ router.post("/:id/alunos", async (req, res) => {
     
     // Verificar se o aluno já está na turma
     const existeRelacao = await turmaAlunoRepository.findOne({
-      where: { turmaId, alunoId }
+      where: { turmaId, alunoId: alunoIdParsed }
     });
     if (existeRelacao) {
       return res.status(400).json({ message: "Aluno já está cadastrado nesta turma" });
@@ -147,7 +198,7 @@ router.post("/:id/alunos", async (req, res) => {
     // Criar a relação
     const turmaAluno = turmaAlunoRepository.create({
       turmaId,
-      alunoId
+      alunoId: alunoIdParsed
     });
     
     const result = await turmaAlunoRepository.save(turmaAluno);
@@ -162,6 +213,14 @@ router.delete("/:id/alunos/:alunoId", async (req, res) => {
   try {
     const turmaId = parseInt(req.params.id);
     const alunoId = parseInt(req.params.alunoId);
+    
+    if (isNaN(turmaId)) {
+      return res.status(400).json({ message: "ID da turma inválido" });
+    }
+    
+    if (isNaN(alunoId)) {
+      return res.status(400).json({ message: "ID do aluno inválido" });
+    }
     
     const turmaAluno = await turmaAlunoRepository.findOne({
       where: { turmaId, alunoId }

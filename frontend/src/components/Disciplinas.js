@@ -7,8 +7,8 @@ function Disciplinas() {
   const [filtro, setFiltro] = useState('');
   const [ordenacao, setOrdenacao] = useState({ campo: 'nome', direcao: 'asc' });
 
-  const API_URL_DISCIPLINAS = 'http://localhost:3001/disciplinas';
-  const API_URL_PROFESSORES = 'http://localhost:3001/professores';
+  const API_URL_DISCIPLINAS = 'http://localhost:3001/api/disciplinas';
+  const API_URL_PROFESSORES = 'http://localhost:3001/api/professores';
 
   useEffect(() => {
     carregarDisciplinas();

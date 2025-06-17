@@ -7,7 +7,7 @@ function AlunoReativar() {
   const [filtro, setFiltro] = useState('');
   const navigate = useNavigate();
 
-  const API_URL = 'http://localhost:3001/alunos';
+  const API_URL = 'http://localhost:3001/api/alunos';
 
   useEffect(() => {
     carregarAlunos();

@@ -7,7 +7,7 @@ function ProfessorReativar() {
   const [filtro, setFiltro] = useState('');
   const navigate = useNavigate();
 
-  const API_URL = 'http://localhost:3001/professores';
+  const API_URL = 'http://localhost:3001/api/professores';
 
   useEffect(() => {
     carregarProfessores();

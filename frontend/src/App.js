@@ -19,6 +19,7 @@ import DisciplinaReativar from './components/DisciplinaReativar';
 import Turmas from './components/Turmas';
 import TurmaForm from './components/TurmaForm';
 import TurmaReativar from './components/TurmaReativar';
+import TurmaAlunos from './components/TurmaAlunos';
 import Locais from './components/Locais';
 import LocalForm from './components/LocalForm';
 import LocalReativar from './components/LocalReativar';
@@ -55,6 +56,7 @@ function App() {
             <Route path="/turmas" element={<Turmas />} />
             <Route path="/turmas/novo" element={<TurmaForm />} />
             <Route path="/turmas/editar/:id" element={<TurmaForm />} />
+            <Route path="/turmas/:id/alunos" element={<TurmaAlunos />} />
             <Route path="/turmas/reativar" element={<TurmaReativar />} />
             
             {/* Rotas para Locais */}

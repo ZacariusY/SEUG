@@ -1,0 +1,60 @@
+# Dependências
+node_modules/
+frontend/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+frontend/build/
+frontend/dist/
+
+# Arquivos de desenvolvimento
+.git/
+.gitignore
+*.md
+README.md
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Arquivos de teste
+**/*.test.js
+**/*.spec.js
+coverage/
+
+# Arquivos de configuração do editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Arquivos temporários
+tmp/
+temp/
+
+# Arquivos de backup
+*.bak
+*.backup
+
+# Arquivos do banco de dados (serão criados no container)
+*.db
+*.sqlite
+*.sqlite3
+
+# Scripts específicos do Windows
+*.bat
+
+# Arquivos de cache
+.cache/
+.parcel-cache/ 

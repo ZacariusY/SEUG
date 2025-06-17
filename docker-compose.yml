@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  seug-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seug-sistema
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    volumes:
+      # Volume para persistir o banco de dados SQLite
+      - seug-data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3001/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  seug-data:
+    driver: local 

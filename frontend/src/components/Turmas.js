@@ -101,6 +101,10 @@ function Turmas() {
     }));
   };
 
+  const gerenciarAlunos = (id) => {
+    window.location.href = `/turmas/${id}/alunos`;
+  };
+
   const editarTurma = (id) => {
     window.location.href = `/turmas/editar/${id}`;
   };
@@ -189,6 +193,12 @@ function Turmas() {
                     <td>{getNomeDisciplina(turma.disciplinaId)}</td>
                     <td>{getNomeLocal(turma.localId)}</td>
                     <td>
+                      <button
+                        className="btn btn-sm btn-info me-2"
+                        onClick={() => gerenciarAlunos(turma.id)}
+                      >
+                        Gerenciar Alunos
+                      </button>
                       <button
                         className="btn btn-sm btn-warning me-2"
                         onClick={() => editarTurma(turma.id)}

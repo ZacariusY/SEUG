@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { AppDataSource } = require("../database/data-source");
 const Aluno = require("../entities/Aluno");
+const TurmaAluno = require("../entities/TurmaAluno");
 
 const alunoRepository = AppDataSource.getRepository(Aluno);
+const turmaAlunoRepository = AppDataSource.getRepository(TurmaAluno);
 
 // Listar todos os alunos
 router.get("/", async (req, res) => {
@@ -91,6 +93,22 @@ router.patch("/:id/status", async (req, res) => {
     res.json(result);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+});
+
+// Buscar turmas de um aluno
+router.get("/:id/turmas", async (req, res) => {
+  try {
+    const alunoId = parseInt(req.params.id);
+    const turmasAluno = await turmaAlunoRepository.find({
+      where: { alunoId },
+      relations: ["turma", "turma.disciplina", "turma.local"]
+    });
+    
+    const turmas = turmasAluno.map(ta => ta.turma);
+    res.json(turmas);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 

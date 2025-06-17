@@ -9,6 +9,7 @@ function Pesquisa() {
   const [categoria, setCategoria] = useState('professores');
   const [carregando, setCarregando] = useState(false);
   const [filtroTabela, setFiltroTabela] = useState('');
+  const [alunosTurmas, setAlunosTurmas] = useState({});
 
   const categorias = [
     { value: 'professores', label: 'Professores', endpoint: 'professores' },
@@ -21,6 +22,7 @@ function Pesquisa() {
   const pesquisar = async () => {
     if (!termo.trim()) {
       setResultados([]);
+      setAlunosTurmas({});
       return;
     }
 
@@ -37,6 +39,23 @@ function Pesquisa() {
         });
       
       setResultados(resultadosFiltrados);
+
+      // Se for pesquisa de turmas, buscar os alunos de cada turma
+      if (categoria === 'turmas' && resultadosFiltrados.length > 0) {
+        const alunosData = {};
+        for (const turma of resultadosFiltrados) {
+          try {
+            const alunosResponse = await axios.get(`http://localhost:3001/turmas/${turma.id}/alunos`);
+            alunosData[turma.id] = alunosResponse.data;
+          } catch (error) {
+            console.error(`Erro ao carregar alunos da turma ${turma.id}:`, error);
+            alunosData[turma.id] = [];
+          }
+        }
+        setAlunosTurmas(alunosData);
+      } else {
+        setAlunosTurmas({});
+      }
     } catch (error) {
       console.error('Erro na pesquisa:', error);
       alert('Erro ao realizar pesquisa: ' + error.message);
@@ -144,62 +163,113 @@ function Pesquisa() {
 
               {/* Tabela */}
               <div className="table-responsive">
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Nome</th>
-                      <th>Categoria</th>
-                      <th>Status</th>
-                      <th>Detalhes</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {resultadosFiltrados.map((item) => (
-                      <tr key={item.id}>
-                        <td>{item.id}</td>
-                        <td>{item.nome}</td>
-                        <td>
-                          <span className="badge bg-secondary">
-                            {categorias.find(c => c.value === categoria)?.label}
-                          </span>
-                        </td>
-                        <td>
-                          <span className={`badge ${item.ativo ? 'bg-success' : 'bg-danger'}`}>
-                            {item.ativo ? 'Ativo' : 'Inativo'}
-                          </span>
-                        </td>
-                        <td>
-                          {categoria === 'professores' && (
-                            <small className="text-muted">
-                              CPF: {item.cpf} | {item.titulacao}
-                            </small>
-                          )}
-                          {categoria === 'alunos' && (
-                            <small className="text-muted">
-                              Email: {item.email}
-                            </small>
-                          )}
-                          {categoria === 'disciplinas' && (
-                            <small className="text-muted">
-                              Código: {item.codigo} | {item.periodo}
-                            </small>
-                          )}
-                          {categoria === 'turmas' && (
-                            <small className="text-muted">
-                              {item.diaSemana} | {item.horarioInicio}-{item.horarioTermino}
-                            </small>
-                          )}
-                          {categoria === 'locais' && (
-                            <small className="text-muted">
-                              Local: {item.local} | Capacidade: {item.capacidade}
-                            </small>
-                          )}
-                        </td>
-                      </tr>
+                {categoria === 'turmas' ? (
+                  // Tabela especial para turmas com alunos
+                  <div>
+                    {resultadosFiltrados.map((turma) => (
+                      <div key={turma.id} className="mb-4">
+                        <div className="card">
+                          <div className="card-header bg-primary text-white">
+                            <h6 className="mb-0">
+                              <strong>Turma:</strong> {turma.nome} | 
+                              <strong> Dia:</strong> {turma.diaSemana} | 
+                              <strong> Horário:</strong> {turma.horarioInicio}-{turma.horarioTermino}
+                              <span className="float-end">
+                                <span className={`badge ${turma.ativo ? 'bg-success' : 'bg-danger'}`}>
+                                  {turma.ativo ? 'Ativo' : 'Inativo'}
+                                </span>
+                              </span>
+                            </h6>
+                          </div>
+                          <div className="card-body">
+                            <h6 className="text-muted mb-3">
+                              Alunos Matriculados ({alunosTurmas[turma.id]?.length || 0})
+                            </h6>
+                            {alunosTurmas[turma.id] && alunosTurmas[turma.id].length > 0 ? (
+                              <div className="table-responsive">
+                                                                 <table className="table table-sm table-striped">
+                                   <thead>
+                                     <tr>
+                                       <th>ID</th>
+                                       <th>Nome do Aluno</th>
+                                       <th>Email</th>
+                                     </tr>
+                                   </thead>
+                                   <tbody>
+                                     {alunosTurmas[turma.id].map((aluno) => (
+                                       <tr key={aluno.id}>
+                                         <td>{aluno.id}</td>
+                                         <td>{aluno.nome}</td>
+                                         <td>{aluno.email}</td>
+                                       </tr>
+                                     ))}
+                                   </tbody>
+                                 </table>
+                              </div>
+                            ) : (
+                              <div className="text-center py-3">
+                                <span className="text-muted">Nenhum aluno matriculado nesta turma</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
                     ))}
-                  </tbody>
-                </table>
+                  </div>
+                ) : (
+                  // Tabela padrão para outras categorias
+                  <table className="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Categoria</th>
+                        <th>Status</th>
+                        <th>Detalhes</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {resultadosFiltrados.map((item) => (
+                        <tr key={item.id}>
+                          <td>{item.id}</td>
+                          <td>{item.nome}</td>
+                          <td>
+                            <span className="badge bg-secondary">
+                              {categorias.find(c => c.value === categoria)?.label}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`badge ${item.ativo ? 'bg-success' : 'bg-danger'}`}>
+                              {item.ativo ? 'Ativo' : 'Inativo'}
+                            </span>
+                          </td>
+                          <td>
+                            {categoria === 'professores' && (
+                              <small className="text-muted">
+                                CPF: {item.cpf} | {item.titulacao}
+                              </small>
+                            )}
+                            {categoria === 'alunos' && (
+                              <small className="text-muted">
+                                Email: {item.email}
+                              </small>
+                            )}
+                            {categoria === 'disciplinas' && (
+                              <small className="text-muted">
+                                Código: {item.codigo} | {item.periodo}
+                              </small>
+                            )}
+                            {categoria === 'locais' && (
+                              <small className="text-muted">
+                                Local: {item.local} | Capacidade: {item.capacidade}
+                              </small>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </>
           ) : (
